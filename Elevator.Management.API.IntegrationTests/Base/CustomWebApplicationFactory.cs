@@ -22,25 +22,25 @@ namespace Elevator.Management.API.IntegrationTests.Base
                     options.UseInMemoryDatabase("ElevatorDbContextInMemoryTest");
                 });
 
-                var sp = services.BuildServiceProvider();
+                var serviceProvider = services.BuildServiceProvider();
 
-                using (var scope = sp.CreateScope())
+                using var scope = serviceProvider.CreateScope();
+                var scopedServices = scope.ServiceProvider;
+                var context = scopedServices.GetRequiredService<ElevatorDbContext>();
+                var logger = scopedServices.GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
+
+                context.Database.EnsureCreated();
+
+                try
                 {
-                    var scopedServices = scope.ServiceProvider;
-                    var context = scopedServices.GetRequiredService<ElevatorDbContext>();
-                    var logger = scopedServices.GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
+                    Utilities.InitializeDbForTests(context);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, $"An error occurred seeding the database with test messages. Error: {ex.Message}");
+                }
 
-                    context.Database.EnsureCreated();
-
-                    try
-                    {
-                        Utilities.InitializeDbForTests(context);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, $"An error occurred seeding the database with test messages. Error: {ex.Message}");
-                    }
-                };
+                ;
             });
         }
 

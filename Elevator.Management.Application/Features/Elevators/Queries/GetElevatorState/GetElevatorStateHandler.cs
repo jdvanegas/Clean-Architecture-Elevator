@@ -29,32 +29,30 @@ namespace Elevator.Management.Application.Features.Elevators.Queries.GetElevator
 
         public async Task<ElevatorDto> Handle(GetElevatorStateQuery request, CancellationToken cancellationToken)
         {
-            var elevator = await _elevatorRepository.GetByIdAsync(request.Id);
-
-            if (elevator == null)
-                throw new NotFoundException(nameof(Domain.Entities.Elevator), request.Id);
+            var elevator = await _elevatorRepository.GetByIdAsync(request.Id) ?? 
+                           throw new NotFoundException(nameof(Domain.Entities.Elevator), request.Id);
 
             var elevatorDto = _mapper.Map<ElevatorDto>(elevator);
 
             if (elevator.State == Domain.Enums.ElevatorState.Still) return elevatorDto;
 
-            var movements = _movementRepository.GetByQuery(m => m.ElevatorId == elevator.ElevatorId);
+            var movements = _movementRepository.GetByQuery(movement => movement.ElevatorId == elevator.ElevatorId);
 
-            var upMovements = movements.Where(m => m.DestinationFloor > elevator.CurrentFloor);
+            var upMovements = movements.Where(movement => movement.DestinationFloor > elevator.CurrentFloor);
             var downMovements = movements.Where(m => m.DestinationFloor < elevator.CurrentFloor);
 
             if (elevatorDto.Satate == Domain.Enums.ElevatorState.GoingUp)
             {
-                elevatorDto.NextFloors.AddRange(upMovements.Select(m => m.DestinationFloor).OrderBy(m => m));
-                elevatorDto.NextFloors.AddRange(downMovements.Select(m => m.DestinationFloor).OrderByDescending(m => m));
+                elevatorDto.NextFloors.AddRange(upMovements.Select(movement => movement.DestinationFloor).OrderBy(m => m));
+                elevatorDto.NextFloors.AddRange(downMovements.Select(movement => movement.DestinationFloor).OrderByDescending(m => m));
             }
             else
             {
-                elevatorDto.NextFloors.AddRange(downMovements.Select(m => m.DestinationFloor).OrderByDescending(m => m));
-                elevatorDto.NextFloors.AddRange(upMovements.Select(m => m.DestinationFloor).OrderBy(m => m));
+                elevatorDto.NextFloors.AddRange(downMovements.Select(movement => movement.DestinationFloor).OrderByDescending(m => m));
+                elevatorDto.NextFloors.AddRange(upMovements.Select(movement => movement.DestinationFloor).OrderBy(m => m));
             }
 
-            _logger.LogError($"Successful Elevator get by Id {elevator.ElevatorId}");
+            _logger.LogInformation($"Successful Elevator get by Id {elevator.ElevatorId}");
 
             return elevatorDto;
         }

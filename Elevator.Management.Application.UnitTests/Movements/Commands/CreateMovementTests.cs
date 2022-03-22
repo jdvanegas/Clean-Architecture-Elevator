@@ -1,24 +1,24 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoMapper;
 using Elevator.Management.Application.Contracts.Persistence;
-using Elevator.Management.Application.Features.Movement.Commands.CreateMovement;
+using Elevator.Management.Application.Features.Movements.Commands.CreateMovement;
 using Elevator.Management.Application.Profiles;
 using Elevator.Management.Application.UnitTests.Mocks;
 using Elevator.Management.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Shouldly;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace Elevator.Management.Application.UnitTests.Categories.Commands
+namespace Elevator.Management.Application.UnitTests.Movements.Commands
 {
     public class CreateMovementTests
     {
         private readonly IMapper _mapper;
         private readonly Mock<IElevatorRepository> _mockElevatorRepository;
-        private readonly Mock<IAsyncRepository<Movement>> _mockMovementRepository;
+        private readonly Mock<IAsyncRepository<Domain.Entities.Movement>> _mockMovementRepository;
         private readonly Mock<IAsyncRepository<Building>> _mockBuildingRepository;
         private readonly ILogger<CreateMovementCommandHandler> _logger;
 

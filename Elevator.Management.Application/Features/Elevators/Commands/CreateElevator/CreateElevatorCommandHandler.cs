@@ -29,7 +29,7 @@ namespace Elevator.Management.Application.Features.Elevators.Commands.CreateElev
         public async Task<Guid> Handle(CreateElevatorCommand request, CancellationToken cancellationToken)
         {
             var validator = new CreateElevatorCommandValidator(_elevatorRepository, _buildingRepository);
-            var validationResult = await validator.ValidateAsync(request);
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
             
             if (validationResult.Errors.Count > 0)
                 throw new Exceptions.ValidationException(validationResult);
@@ -38,7 +38,7 @@ namespace Elevator.Management.Application.Features.Elevators.Commands.CreateElev
 
             elevator = await _elevatorRepository.AddAsync(elevator);
 
-            _logger.LogError($"Elevator created with Id {elevator.ElevatorId}");
+            _logger.LogInformation($"Elevator created with Id {elevator.ElevatorId}");
             
             return elevator.ElevatorId;
         }

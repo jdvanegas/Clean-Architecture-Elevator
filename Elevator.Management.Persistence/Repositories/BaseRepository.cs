@@ -26,7 +26,7 @@ namespace Elevator.Management.Persistence.Repositories
             return await _dbContext.Set<T>().ToListAsync();
         }
 
-        public async virtual Task<IReadOnlyList<T>> GetPagedReponseAsync(int page, int size)
+        public virtual async Task<IReadOnlyList<T>> GetPagedReponseAsync(int page, int size)
         {
             return await _dbContext.Set<T>().Skip((page - 1) * size).Take(size).AsNoTracking().ToListAsync();
         }

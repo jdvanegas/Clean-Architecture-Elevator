@@ -5,6 +5,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Logs\**" />
+	  <Content Remove="Logs\**" />
+	  <EmbeddedResource Remove="Logs\**" />
+	  <None Remove="Logs\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.10">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -25,10 +32,6 @@
 		<ProjectReference Include="..\Elevator.Management.Identity\Elevator.Management.Identity.csproj" />
 		<ProjectReference Include="..\Elevator.Management.Infrastructure\Elevator.Management.Infrastructure.csproj" />
 		<ProjectReference Include="..\Elevator.Management.Persistence\Elevator.Management.Persistence.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Logs\" />
 	</ItemGroup>
 
 

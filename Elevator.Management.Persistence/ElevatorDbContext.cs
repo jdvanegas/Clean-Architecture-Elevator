@@ -31,15 +31,15 @@ namespace Elevator.Management.Persistence
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ElevatorDbContext).Assembly);
 
+            modelBuilder.Entity<Building>().HasKey(e => e.BuildingId);
+            modelBuilder.Entity<Domain.Entities.Elevator>().HasKey(e => e.ElevatorId);
+            modelBuilder.Entity<Movement>().HasKey(e => e.MovementId);
+
             //seed data, added through migrations
             var buildingId = Guid.Parse("{B0788D2F-8003-43C1-92A4-EDC76A7C5DDE}");
             var elevatorAId = Guid.Parse("{6313179F-7837-473A-A4D5-A5571B43E6A6}");
             var elevatorBId = Guid.Parse("{BF3F3002-7E53-441E-8B76-F6280BE284AA}");
             var elevatorCId = Guid.Parse("{FE98F549-E790-4E9F-AA16-18C2292A2EE9}");
-
-            modelBuilder.Entity<Building>().HasKey(e => e.BuildingId);
-            modelBuilder.Entity<Domain.Entities.Elevator>().HasKey(e => e.ElevatorId);
-            modelBuilder.Entity<Movement>().HasKey(e => e.MovementId);          
 
             modelBuilder.Entity<Building>().HasData(new Building
             {

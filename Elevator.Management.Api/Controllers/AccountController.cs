@@ -16,15 +16,13 @@ namespace Elevator.Management.Api.Controllers
         }
 
         [HttpPost("authenticate")]
-        public async Task<ActionResult<AuthenticationResponse>> AuthenticateAsync(AuthenticationRequest request)
-        {
-            return Ok(await _authenticationService.AuthenticateAsync(request));
-        }
+        public async Task<ActionResult<AuthenticationResponse>> AuthenticateAsync(AuthenticationRequest request) =>
+            Ok(await _authenticationService.AuthenticateAsync(request));
+        
 
         [HttpPost("register")]
-        public async Task<ActionResult<RegistrationResponse>> RegisterAsync(RegistrationRequest request)
-        {
-            return Ok(await _authenticationService.RegisterAsync(request));
-        }
+        public async Task<ActionResult<RegistrationResponse>> RegisterAsync(RegistrationRequest request) => 
+            Ok(await _authenticationService.RegisterAsync(request));
+        
     }
 }

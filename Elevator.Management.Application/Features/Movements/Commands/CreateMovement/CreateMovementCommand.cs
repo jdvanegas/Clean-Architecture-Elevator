@@ -1,7 +1,7 @@
-﻿using MediatR;
-using System;
+﻿using System;
+using MediatR;
 
-namespace Elevator.Management.Application.Features.Movement.Commands.CreateMovement
+namespace Elevator.Management.Application.Features.Movements.Commands.CreateMovement
 {
     public class CreateMovementCommand: IRequest<Guid>
     {

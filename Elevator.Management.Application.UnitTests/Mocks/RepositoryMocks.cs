@@ -94,7 +94,7 @@ namespace Elevator.Management.Application.UnitTests.Mocks
                     ElevatorId = elevatorAId,
                     DestinationFloor = 4
                 },
-                new Movement
+                new Domain.Entities.Movement
                 {
                     ElevatorId = elevatorBId,
                     DestinationFloor = 5

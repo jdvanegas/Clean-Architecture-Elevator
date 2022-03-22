@@ -31,23 +31,18 @@ namespace Elevator.Management.Identity.Services
 
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-
-            if (user == null)
-            {
-                throw new Exception($"User with {request.Email} not found.");
-            }
+            var user = await _userManager.FindByEmailAsync(request.Email) ?? 
+                       throw new Exception($"User with {request.Email} not found.");
 
             var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, lockoutOnFailure: false);
 
             if (!result.Succeeded)
-            {
                 throw new Exception($"Credentials for '{request.Email} aren't valid'.");
-            }
+            
 
-            JwtSecurityToken jwtSecurityToken = await GenerateToken(user);
+            var jwtSecurityToken = await GenerateToken(user);
 
-            AuthenticationResponse response = new AuthenticationResponse
+            var response = new AuthenticationResponse
             {
                 Id = user.Id,
                 Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
@@ -63,9 +58,7 @@ namespace Elevator.Management.Identity.Services
             var existingUser = await _userManager.FindByNameAsync(request.UserName);
 
             if (existingUser != null)
-            {
                 throw new Exception($"Username '{request.UserName}' already exists.");
-            }
 
             var user = new ApplicationUser
             {
@@ -78,23 +71,16 @@ namespace Elevator.Management.Identity.Services
 
             var existingEmail = await _userManager.FindByEmailAsync(request.Email);
 
-            if (existingEmail == null)
-            {
-                var result = await _userManager.CreateAsync(user, request.Password);
+            if (existingEmail != null) throw new Exception($"Email {request.Email} already exists.");
 
-                if (result.Succeeded)
-                {
-                    return new RegistrationResponse() { UserId = user.Id };
-                }
-                else
-                {
-                    throw new Exception($"{result.Errors}");
-                }
-            }
-            else
-            {
-                throw new Exception($"Email {request.Email } already exists.");
-            }
+            var result = await _userManager.CreateAsync(user, request.Password);
+
+            if (result.Succeeded)
+                return new RegistrationResponse { UserId = user.Id };
+            
+
+            throw new Exception($"{result.Errors}");
+
         }
 
         private async Task<JwtSecurityToken> GenerateToken(ApplicationUser user)
@@ -102,12 +88,7 @@ namespace Elevator.Management.Identity.Services
             var userClaims = await _userManager.GetClaimsAsync(user);
             var roles = await _userManager.GetRolesAsync(user);
 
-            var roleClaims = new List<Claim>();
-
-            for (int i = 0; i < roles.Count; i++)
-            {
-                roleClaims.Add(new Claim("roles", roles[i]));
-            }
+            var roleClaims = roles.Select(t => new Claim("roles", t)).ToList();
 
             var claims = new[]
             {

@@ -1,10 +1,10 @@
-﻿using Elevator.Management.Application.Features.Movement.Commands.CreateMovement;
-using Elevator.Management.Application.Features.Movement.Commands.ExecuteMovement;
+﻿using Elevator.Management.Application.Features.Movement.Commands.ExecuteMovement;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Elevator.Management.Application.Features.Movements.Commands.CreateMovement;
 
 namespace Elevator.Management.Api.Controllers
 {
@@ -20,13 +20,13 @@ namespace Elevator.Management.Api.Controllers
         }
 
         [HttpPost("create", Name = "CreateMovement")]
-        public async Task<ActionResult<Guid>> Create([FromBody] CreateMovementCommand createEventCommand)
-        {
-            var id = await _mediator.Send(createEventCommand);
-            return Ok(id);
-        }
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<Guid>> Create([FromBody] CreateMovementCommand createEventCommand) =>
+             Created("", await _mediator.Send(createEventCommand));
+        
 
-        [HttpPut("execute/{elevatorId}", Name = "ExecuteMovement")]
+        [HttpPut("execute/{elevatorId:guid}", Name = "ExecuteMovement")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]

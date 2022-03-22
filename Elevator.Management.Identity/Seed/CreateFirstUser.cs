@@ -19,9 +19,8 @@ namespace Elevator.Management.Identity.Seed
 
             var user = await userManager.FindByEmailAsync(applicationUser.Email);
             if (user == null)
-            {
                 await userManager.CreateAsync(applicationUser, "Elevator#01");
-            }
+            
         }
     }
 }

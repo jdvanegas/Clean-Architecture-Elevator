@@ -1,15 +1,15 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoMapper;
 using Elevator.Management.Application.Contracts.Persistence;
 using Elevator.Management.Application.Exceptions;
-using Elevator.Management.Domain.Entities;
+using Elevator.Management.Application.Features.Movement.Commands.ExecuteMovement;
 using Elevator.Management.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Elevator.Management.Application.Features.Movement.Commands.ExecuteMovement
+namespace Elevator.Management.Application.Features.Movements.Commands.ExecuteMovement
 {
     public class ExecuteMovementCommandHandler : IRequestHandler<ExecuteMovementCommand>
     {
@@ -29,20 +29,18 @@ namespace Elevator.Management.Application.Features.Movement.Commands.ExecuteMove
 
         public async Task<Unit> Handle(ExecuteMovementCommand request, CancellationToken cancellationToken)
         {
-            var elevator = await _elevatorRepository.GetByIdAsync(request.ElevatorId);
-
-            if (elevator == null)
-                throw new NotFoundException(nameof(Domain.Entities.Elevator), request.ElevatorId);
+            var elevator = await _elevatorRepository.GetByIdAsync(request.ElevatorId) ?? 
+                           throw new NotFoundException(nameof(Domain.Entities.Elevator), request.ElevatorId);
 
             var movements = _movementRepository.GetByQuery(m => m.ElevatorId == elevator.ElevatorId);
-            if (movements.Count() == 0) throw new BadRequestException("There are not movements for this elevator");
+            if (!movements.Any()) throw new BadRequestException("There are not movements for this elevator");
 
             var upMovements = movements.Where(m => m.DestinationFloor > elevator.CurrentFloor);
             var downMovements = movements.Where(m => m.DestinationFloor < elevator.CurrentFloor);
 
             var movementToExecute = elevator.State == ElevatorState.GoingUp ?
-                upMovements.OrderBy(m => m.DestinationFloor).FirstOrDefault() :
-                downMovements.OrderByDescending(m => m.DestinationFloor).FirstOrDefault();
+                upMovements.OrderBy(m => m.DestinationFloor).First() :
+                downMovements.OrderByDescending(m => m.DestinationFloor).First();
 
             elevator.CurrentFloor = movementToExecute.DestinationFloor;
             
@@ -50,23 +48,23 @@ namespace Elevator.Management.Application.Features.Movement.Commands.ExecuteMove
 
             if(elevator.State == ElevatorState.GoingUp)
             {
-                if (upMovements.Count() == 1 && downMovements.Count() > 0)
+                if (upMovements.Count() == 1 && downMovements.Any())
                     elevator.State = ElevatorState.GoingDown;
-                if(upMovements.Count() == 1 && downMovements.Count() == 0)
+                if(upMovements.Count() == 1 && !downMovements.Any())
                     elevator.State = ElevatorState.Still;
             }
             else
             {
-                if (downMovements.Count() == 1 && upMovements.Count() > 0)
+                if (downMovements.Count() == 1 && upMovements.Any())
                     elevator.State = ElevatorState.GoingUp;
-                if (downMovements.Count() == 1 && upMovements.Count() == 0)
+                if (downMovements.Count() == 1 && !upMovements.Any())
                     elevator.State = ElevatorState.Still;
             }
 
             await _elevatorRepository.UpdateAsync(elevator);
 
             Thread.Sleep(1000);
-            _logger.LogInformation($"Elevator movement executed successful");
+            _logger.LogInformation("Elevator movement executed successful");
 
             return Unit.Value;
         }

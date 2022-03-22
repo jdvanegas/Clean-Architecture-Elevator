@@ -11,7 +11,6 @@ namespace Elevator.Management.Persistence.IntegrationTests
     public class ElevatorDbContextTests
     {
         private readonly ElevatorDbContext _elevatorDbContext;
-        private readonly Mock<ILoggedInUserService> _loggedInUserServiceMock;
         private readonly string _loggedInUserId;
 
         public ElevatorDbContextTests()
@@ -19,10 +18,10 @@ namespace Elevator.Management.Persistence.IntegrationTests
             var dbContextOptions = new DbContextOptionsBuilder<ElevatorDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
 
             _loggedInUserId = "00000000-0000-0000-0000-000000000000";
-            _loggedInUserServiceMock = new Mock<ILoggedInUserService>();
-            _loggedInUserServiceMock.Setup(m => m.UserId).Returns(_loggedInUserId);
+            var loggedInUserServiceMock = new Mock<ILoggedInUserService>();
+            loggedInUserServiceMock.Setup(m => m.UserId).Returns(_loggedInUserId);
 
-            _elevatorDbContext = new ElevatorDbContext(dbContextOptions, _loggedInUserServiceMock.Object);
+            _elevatorDbContext = new ElevatorDbContext(dbContextOptions, loggedInUserServiceMock.Object);
         }
 
         [Fact]

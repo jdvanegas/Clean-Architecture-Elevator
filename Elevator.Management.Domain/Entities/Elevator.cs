@@ -1,7 +1,6 @@
 ﻿using Elevator.Management.Domain.Common;
 using Elevator.Management.Domain.Enums;
 using System;
-using System.Collections.Generic;
 
 namespace Elevator.Management.Domain.Entities
 {
@@ -12,7 +11,5 @@ namespace Elevator.Management.Domain.Entities
         public string Name { get; set; }
         public ElevatorState State { get; set; }
         public int CurrentFloor { get; set; }
-        public List<Movement> Movements { get; set; }
-
     }
 }

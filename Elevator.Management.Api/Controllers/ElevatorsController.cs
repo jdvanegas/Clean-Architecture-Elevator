@@ -20,23 +20,19 @@ namespace Elevator.Management.Api.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("state/{id}", Name = "GetCurrentState")]
+        [HttpGet("state/{id:guid}", Name = "GetCurrentState")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesDefaultResponseType]
-        public async Task<ActionResult<ElevatorDto>> GetCurrentState(Guid id)
-        {
-            var dtos = await _mediator.Send(new GetElevatorStateQuery { Id = id});
-            return Ok(dtos);
-        }
+        public async Task<ActionResult<ElevatorDto>> GetCurrentState(Guid id) =>
+            Ok(await _mediator.Send(new GetElevatorStateQuery { Id = id }));
+        
 
         [HttpPost("create", Name = "CreateElevator"), Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<Guid>> Create([FromBody] CreateElevatorCommand createEventCommand)
-        {
-            var id = await _mediator.Send(createEventCommand);
-            return Ok(id);
-        }
+        public async Task<ActionResult<Guid>> Create([FromBody] CreateElevatorCommand createEventCommand) =>
+            Ok(await _mediator.Send(createEventCommand));
+        
     }
 }

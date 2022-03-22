@@ -28,9 +28,9 @@ namespace Elevator.Management.Api.Middleware
             }
         }
 
-        private Task ConvertException(HttpContext context, Exception exception)
+        private static Task ConvertException(HttpContext context, Exception exception)
         {
-            HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
+            var httpStatusCode = HttpStatusCode.InternalServerError;
 
             context.Response.ContentType = "application/json";
 
@@ -46,10 +46,10 @@ namespace Elevator.Management.Api.Middleware
                     httpStatusCode = HttpStatusCode.BadRequest;
                     result = badRequestException.Message;
                     break;
-                case NotFoundException notFoundException:
+                case NotFoundException _:
                     httpStatusCode = HttpStatusCode.NotFound;
                     break;
-                case Exception ex:
+                case { }:
                     httpStatusCode = HttpStatusCode.BadRequest;
                     break;
             }

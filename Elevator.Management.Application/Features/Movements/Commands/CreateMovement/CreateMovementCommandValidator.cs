@@ -1,11 +1,10 @@
-﻿using FluentValidation;
-using Elevator.Management.Application.Contracts.Persistence;
-using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using Elevator.Management.Application.Contracts.Persistence;
 using Elevator.Management.Domain.Entities;
+using FluentValidation;
 
-namespace Elevator.Management.Application.Features.Movement.Commands.CreateMovement
+namespace Elevator.Management.Application.Features.Movements.Commands.CreateMovement
 {
     public class CreateMovementCommandValidator : AbstractValidator<CreateMovementCommand>
     {
@@ -18,7 +17,7 @@ namespace Elevator.Management.Application.Features.Movement.Commands.CreateMovem
 
             RuleFor(e => e.DestinationFloor)
                 .NotEqual(0)
-                .WithMessage("Destination floor cann't be '0'");
+                .WithMessage("Destination floor cannot be '0'");
 
             RuleFor(e => e)
                 .MustAsync(FloorValid)

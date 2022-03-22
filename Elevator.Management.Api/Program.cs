@@ -13,7 +13,7 @@ namespace Elevator.Management.Api
 {
     public class Program
     {
-        public async static Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
@@ -29,7 +29,7 @@ namespace Elevator.Management.Api
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+                services.GetRequiredService<ILoggerFactory>();
 
                 try
                 {
@@ -44,7 +44,7 @@ namespace Elevator.Management.Api
                 }
             }
 
-            host.Run();
+            await host.RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

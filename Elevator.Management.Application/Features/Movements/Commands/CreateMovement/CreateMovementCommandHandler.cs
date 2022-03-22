@@ -1,14 +1,14 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoMapper;
 using Elevator.Management.Application.Contracts.Persistence;
 using Elevator.Management.Application.Exceptions;
 using Elevator.Management.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Elevator.Management.Application.Features.Movement.Commands.CreateMovement
+namespace Elevator.Management.Application.Features.Movements.Commands.CreateMovement
 {
     public class CreateMovementCommandHandler : IRequestHandler<CreateMovementCommand, Guid>
     {
@@ -33,13 +33,13 @@ namespace Elevator.Management.Application.Features.Movement.Commands.CreateMovem
         public async Task<Guid> Handle(CreateMovementCommand request, CancellationToken cancellationToken)
         {
             var validator = new CreateMovementCommandValidator(_elevatorRepository, _buildingRepository);
-            var validationResult = await validator.ValidateAsync(request);
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
             
             if (validationResult.Errors.Count > 0)
                 throw new ValidationException(validationResult);
 
-            var elevator = await _elevatorRepository.GetByIdAsync(request.ElevatorId);
-            if(elevator == null) throw new NotFoundException(nameof(Domain.Entities.Elevator), request.ElevatorId);
+            var elevator = await _elevatorRepository.GetByIdAsync(request.ElevatorId) ?? 
+                           throw new NotFoundException(nameof(Domain.Entities.Elevator), request.ElevatorId);
 
             var movement = _mapper.Map<Domain.Entities.Movement>(request);
             movement = await _movementRepository.AddAsync(movement);

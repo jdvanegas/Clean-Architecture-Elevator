@@ -24,7 +24,7 @@ namespace Elevator.Management.Application.Features.Elevators.Commands.CreateElev
 
             RuleFor(p => p.CurrentFloor)
             .NotEqual(0)
-            .WithMessage("Current floor cann't be '0'");
+            .WithMessage("Current floor can't be '0'");
 
             RuleFor(e => e)
                 .MustAsync(FloorValid)
