@@ -1,6 +1,6 @@
-﻿using FluentValidation.Results;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Elevator.Management.Application.Exceptions
 {
@@ -8,13 +8,13 @@ namespace Elevator.Management.Application.Exceptions
     {
         public List<string> ValdationErrors { get; set; }
 
-        public ValidationException(ValidationResult validationResult)
+        public ValidationException(IEnumerable<string> validationErrors)
         {
             ValdationErrors = new List<string>();
 
-            foreach (var validationError in validationResult.Errors)
+            foreach (var validationError in validationErrors.Distinct())
             {
-                ValdationErrors.Add(validationError.ErrorMessage);
+                ValdationErrors.Add(validationError);
             }
         }
     }

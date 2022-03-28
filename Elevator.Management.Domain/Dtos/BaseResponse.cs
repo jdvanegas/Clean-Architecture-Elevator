@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Elevator.Management.Application.Responses
+namespace Elevator.Management.Domain.Responses
 {
     public class BaseResponse
     {
@@ -8,6 +8,7 @@ namespace Elevator.Management.Application.Responses
         {
             Success = true;
         }
+
         public BaseResponse(string message = null)
         {
             Success = true;
@@ -18,6 +19,12 @@ namespace Elevator.Management.Application.Responses
         {
             Success = success;
             Message = message;
+        }
+
+        public BaseResponse(List<string> validationErrors)
+        {
+            Success = false;
+            ValidationErrors = validationErrors;
         }
 
         public bool Success { get; set; }

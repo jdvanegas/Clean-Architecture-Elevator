@@ -3,57 +3,61 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Elevator.Management.Persistence.Repositories
 {
     public class BaseRepository<T> : IAsyncRepository<T> where T : class
     {
-        protected readonly ElevatorDbContext _dbContext;
+        protected readonly ElevatorDbContext DbContext;
 
         public BaseRepository(ElevatorDbContext dbContext)
         {
-            _dbContext = dbContext;
+            DbContext = dbContext;
         }
 
-        public virtual async Task<T> GetByIdAsync(Guid id)
-        {
-            return await _dbContext.Set<T>().FindAsync(id);
-        }
-
-        public async Task<IReadOnlyList<T>> ListAllAsync()
-        {
-            return await _dbContext.Set<T>().ToListAsync();
-        }
-
-        public virtual async Task<IReadOnlyList<T>> GetPagedReponseAsync(int page, int size)
-        {
-            return await _dbContext.Set<T>().Skip((page - 1) * size).Take(size).AsNoTracking().ToListAsync();
-        }
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> query) =>
+            await DbContext.Set<T>().AnyAsync(query);
 
         public async Task<T> AddAsync(T entity)
         {
-            await _dbContext.Set<T>().AddAsync(entity);
-            await _dbContext.SaveChangesAsync();
+            await DbContext.Set<T>().AddAsync(entity);
+            await DbContext.SaveChangesAsync();
 
             return entity;
         }
 
-        public async Task UpdateAsync(T entity)
-        {
-            _dbContext.Entry(entity).State = EntityState.Modified;
-            await _dbContext.SaveChangesAsync();
-        }
-
         public async Task DeleteAsync(T entity)
         {
-            _dbContext.Set<T>().Remove(entity);
-            await _dbContext.SaveChangesAsync();
+            DbContext.Set<T>().Remove(entity);
+            await DbContext.SaveChangesAsync();
+        }
+
+        public virtual async Task<T> GetByIdAsync(Guid id)
+        {
+            return await DbContext.Set<T>().FindAsync(id);
         }
 
         public IReadOnlyList<T> GetByQuery(Func<T, bool> query)
         {
-            return _dbContext.Set<T>().AsQueryable().Where(query).ToList();
+            return DbContext.Set<T>().Where(query).ToList();
+        }
+
+        public virtual async Task<IReadOnlyList<T>> GetPagedResponseAsync(int page, int size)
+        {
+            return await DbContext.Set<T>().Skip((page - 1) * size).Take(size).AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<T>> ListAllAsync()
+        {
+            return await DbContext.Set<T>().ToListAsync();
+        }
+
+        public async Task UpdateAsync(T entity)
+        {
+            DbContext.Entry(entity).State = EntityState.Modified;
+            await DbContext.SaveChangesAsync();
         }
     }
 }

@@ -7,7 +7,6 @@ namespace Elevator.Management.Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
-
             return services;
         }
     }

@@ -1,10 +1,10 @@
 ﻿using Elevator.Management.Application.Features.Movement.Commands.ExecuteMovement;
+using Elevator.Management.Application.Features.Movements.Commands.CreateMovement;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using Elevator.Management.Application.Features.Movements.Commands.CreateMovement;
 
 namespace Elevator.Management.Api.Controllers
 {
@@ -24,7 +24,6 @@ namespace Elevator.Management.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<Guid>> Create([FromBody] CreateMovementCommand createEventCommand) =>
              Created("", await _mediator.Send(createEventCommand));
-        
 
         [HttpPut("execute/{elevatorId:guid}", Name = "ExecuteMovement")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -32,7 +31,7 @@ namespace Elevator.Management.Api.Controllers
         [ProducesDefaultResponseType]
         public async Task<ActionResult> Execute(Guid elevatorId)
         {
-            await _mediator.Send(new ExecuteMovementCommand { ElevatorId = elevatorId});
+            await _mediator.Send(new ExecuteMovementCommand { ElevatorId = elevatorId });
             return NoContent();
         }
     }

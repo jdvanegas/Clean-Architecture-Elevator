@@ -1,13 +1,13 @@
-﻿using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Elevator.Management.Application.Contracts.Persistence;
 using Elevator.Management.Application.Exceptions;
 using Elevator.Management.Application.Features.Movement.Commands.ExecuteMovement;
 using Elevator.Management.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Elevator.Management.Application.Features.Movements.Commands.ExecuteMovement
 {
@@ -29,7 +29,7 @@ namespace Elevator.Management.Application.Features.Movements.Commands.ExecuteMov
 
         public async Task<Unit> Handle(ExecuteMovementCommand request, CancellationToken cancellationToken)
         {
-            var elevator = await _elevatorRepository.GetByIdAsync(request.ElevatorId) ?? 
+            var elevator = await _elevatorRepository.GetByIdAsync(request.ElevatorId) ??
                            throw new NotFoundException(nameof(Domain.Entities.Elevator), request.ElevatorId);
 
             var movements = _movementRepository.GetByQuery(m => m.ElevatorId == elevator.ElevatorId);
@@ -43,14 +43,14 @@ namespace Elevator.Management.Application.Features.Movements.Commands.ExecuteMov
                 downMovements.OrderByDescending(m => m.DestinationFloor).First();
 
             elevator.CurrentFloor = movementToExecute.DestinationFloor;
-            
+
             await _movementRepository.DeleteAsync(movementToExecute);
 
-            if(elevator.State == ElevatorState.GoingUp)
+            if (elevator.State == ElevatorState.GoingUp)
             {
                 if (upMovements.Count() == 1 && downMovements.Any())
                     elevator.State = ElevatorState.GoingDown;
-                if(upMovements.Count() == 1 && !downMovements.Any())
+                if (upMovements.Count() == 1 && !downMovements.Any())
                     elevator.State = ElevatorState.Still;
             }
             else
@@ -63,7 +63,7 @@ namespace Elevator.Management.Application.Features.Movements.Commands.ExecuteMov
 
             await _elevatorRepository.UpdateAsync(elevator);
 
-            Thread.Sleep(1000);
+            await Task.Delay(1000, cancellationToken);
             _logger.LogInformation("Elevator movement executed successful");
 
             return Unit.Value;

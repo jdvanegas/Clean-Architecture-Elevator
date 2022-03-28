@@ -10,6 +10,7 @@ namespace Elevator.Management.Api.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
+
         public AccountController(IAuthenticationService authenticationService)
         {
             _authenticationService = authenticationService;
@@ -18,11 +19,9 @@ namespace Elevator.Management.Api.Controllers
         [HttpPost("authenticate")]
         public async Task<ActionResult<AuthenticationResponse>> AuthenticateAsync(AuthenticationRequest request) =>
             Ok(await _authenticationService.AuthenticateAsync(request));
-        
 
         [HttpPost("register")]
-        public async Task<ActionResult<RegistrationResponse>> RegisterAsync(RegistrationRequest request) => 
+        public async Task<ActionResult<RegistrationResponse>> RegisterAsync(RegistrationRequest request) =>
             Ok(await _authenticationService.RegisterAsync(request));
-        
     }
 }

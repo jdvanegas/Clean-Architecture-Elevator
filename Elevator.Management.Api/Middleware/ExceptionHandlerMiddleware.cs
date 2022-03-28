@@ -1,4 +1,5 @@
 ﻿using Elevator.Management.Application.Exceptions;
+using Elevator.Management.Domain.Responses;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
@@ -40,27 +41,26 @@ namespace Elevator.Management.Api.Middleware
             {
                 case ValidationException validationException:
                     httpStatusCode = HttpStatusCode.BadRequest;
-                    result = JsonConvert.SerializeObject(validationException.ValdationErrors);
+                    result = JsonConvert.SerializeObject(new BaseResponse(validationException.ValdationErrors));
                     break;
+
                 case BadRequestException badRequestException:
                     httpStatusCode = HttpStatusCode.BadRequest;
-                    result = badRequestException.Message;
+                    result = JsonConvert.SerializeObject(new BaseResponse(badRequestException.Message, false));
                     break;
-                case NotFoundException _:
+
+                case NotFoundException notFoundException:
                     httpStatusCode = HttpStatusCode.NotFound;
+                    result = JsonConvert.SerializeObject(new BaseResponse(notFoundException.Message, false));
                     break;
+
                 case { }:
-                    httpStatusCode = HttpStatusCode.BadRequest;
+                    httpStatusCode = HttpStatusCode.InternalServerError;
+                    result = JsonConvert.SerializeObject(new BaseResponse(exception.Message, false));
                     break;
             }
 
             context.Response.StatusCode = (int)httpStatusCode;
-
-            if (result == string.Empty)
-            {
-                result = JsonConvert.SerializeObject(new { error = exception.Message });
-            }
-
             return context.Response.WriteAsync(result);
         }
     }

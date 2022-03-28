@@ -13,7 +13,7 @@ namespace Elevator.Management.Persistence.Repositories
 
         public Task<bool> IsElevatorNameUnique(string name, Guid buildingId)
         {
-            var matches =  _dbContext.Elevators.Any(e => e.Name.Equals(name) && e.BuildingId.Equals(buildingId));
+            var matches = DbContext.Elevators.Any(e => e.Name.Equals(name) && e.BuildingId.Equals(buildingId));
             return Task.FromResult(matches);
         }
     }

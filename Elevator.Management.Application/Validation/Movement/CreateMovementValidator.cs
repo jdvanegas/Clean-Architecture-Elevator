@@ -1,16 +1,18 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Elevator.Management.Application.Contracts.Persistence;
+﻿using Elevator.Management.Application.Contracts.Persistence;
+using Elevator.Management.Application.Features.Movements.Commands.CreateMovement;
 using Elevator.Management.Domain.Entities;
 using FluentValidation;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Elevator.Management.Application.Features.Movements.Commands.CreateMovement
+namespace Elevator.Management.Application.Validation.Movement
 {
-    public class CreateMovementCommandValidator : AbstractValidator<CreateMovementCommand>
+    public class CreateMovementValidator : AbstractValidator<CreateMovementCommand>
     {
-        private readonly IElevatorRepository _elevatorRepository;
         private readonly IAsyncRepository<Building> _buildingRepository;
-        public CreateMovementCommandValidator(IElevatorRepository elevatorRepository, IAsyncRepository<Building> buildingRepository)
+        private readonly IElevatorRepository _elevatorRepository;
+
+        public CreateMovementValidator(IElevatorRepository elevatorRepository, IAsyncRepository<Building> buildingRepository)
         {
             _elevatorRepository = elevatorRepository;
             _buildingRepository = buildingRepository;
@@ -36,8 +38,8 @@ namespace Elevator.Management.Application.Features.Movements.Commands.CreateMove
         private async Task<bool> FloorValid(CreateMovementCommand m, CancellationToken token)
         {
             var elevator = await _elevatorRepository.GetByIdAsync(m.ElevatorId);
-            var buildign = await _buildingRepository.GetByIdAsync(elevator.BuildingId);
-            return m.DestinationFloor >= buildign.FirstFloor && m.DestinationFloor <= buildign.LastFloor;
+            var building = await _buildingRepository.GetByIdAsync(elevator.BuildingId);
+            return m.DestinationFloor >= building.FirstFloor && m.DestinationFloor <= building.LastFloor;
         }
     }
 }

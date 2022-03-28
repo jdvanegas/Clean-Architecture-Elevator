@@ -11,11 +11,10 @@ namespace Elevator.Management.Application.Features.Elevators.Commands.CreateElev
 {
     public class CreateElevatorCommandHandler : IRequestHandler<CreateElevatorCommand, Guid>
     {
-        private readonly IElevatorRepository _elevatorRepository;
         private readonly IAsyncRepository<Building> _buildingRepository;
-        private readonly IMapper _mapper;
+        private readonly IElevatorRepository _elevatorRepository;
         private readonly ILogger<CreateElevatorCommandHandler> _logger;
-
+        private readonly IMapper _mapper;
 
         public CreateElevatorCommandHandler(IMapper mapper, IElevatorRepository elevatorRepository,
             IAsyncRepository<Building> buildingRepository, ILogger<CreateElevatorCommandHandler> logger)
@@ -28,18 +27,11 @@ namespace Elevator.Management.Application.Features.Elevators.Commands.CreateElev
 
         public async Task<Guid> Handle(CreateElevatorCommand request, CancellationToken cancellationToken)
         {
-            var validator = new CreateElevatorCommandValidator(_elevatorRepository, _buildingRepository);
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
-            
-            if (validationResult.Errors.Count > 0)
-                throw new Exceptions.ValidationException(validationResult);
-
             var elevator = _mapper.Map<Domain.Entities.Elevator>(request);
-
             elevator = await _elevatorRepository.AddAsync(elevator);
 
             _logger.LogInformation($"Elevator created with Id {elevator.ElevatorId}");
-            
+
             return elevator.ElevatorId;
         }
     }
